@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulador de juros compostos: quanto seu dinheiro rende</title>
+<meta name="description" content="Simule gratuitamente quanto seu dinheiro rende com juros compostos. Informe valor inicial, aporte mensal, taxa e prazo e veja o resultado na hora.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F5FA;--surface:#FFFFFF;--ink:#0E1B2E;--muted:#586A82;--line:#D5DDE8;
+  --invest:#9AA9BF;--juros:#1F4BFF;--cta:#FFC93C;--cta-ink:#1A1400;--focus:#1F4BFF;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A111C;--surface:#121B2A;--ink:#E9EFF8;--muted:#93A3BA;--line:#24324A;
+    --invest:#4A5C78;--juros:#6B8DFF;--focus:#6B8DFF;color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A111C;--surface:#121B2A;--ink:#E9EFF8;--muted:#93A3BA;--line:#24324A;
+  --invest:#4A5C78;--juros:#6B8DFF;--focus:#6B8DFF;color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.55}
+.wrap{max-width:720px;margin:0 auto;padding:28px 20px 48px}
+h1{font-size:clamp(2rem,8vw,3.1rem);line-height:1.04;font-weight:800;letter-spacing:-.02em;margin:0 0 12px}
+.lead{color:var(--muted);margin:0 0 28px;max-width:52ch}
+h2{font-size:1.25rem;font-weight:600;margin:40px 0 12px}
+.calc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:block;font-size:.88rem;color:var(--muted);margin-bottom:4px}
+input,select{width:100%;font:inherit;font-size:1.05rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+input:focus-visible,select:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.out{margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+.out small{color:var(--muted);font-size:.9rem}
+.big{font-size:clamp(2.2rem,10vw,3.4rem);font-weight:800;letter-spacing:-.025em;line-height:1.05;margin:2px 0 14px;font-variant-numeric:tabular-nums}
+.leg{display:flex;flex-wrap:wrap;gap:6px 24px;margin:0 0 16px;font-variant-numeric:tabular-nums}
+.leg span{display:inline-flex;align-items:center;gap:8px}
+.leg i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.chart{display:flex;align-items:flex-end;gap:2px;height:170px}
+.col{flex:1;height:100%;display:flex;flex-direction:column-reverse;min-width:0}
+.col i{display:block;width:100%}
+.col .i{background:var(--invest)}
+.col .j{background:var(--juros)}
+.axis{display:flex;justify-content:space-between;color:var(--muted);font-size:.82rem;margin-top:6px}
+.next{border-top:1px solid var(--line);padding:18px 0}
+.next:last-of-type{border-bottom:1px solid var(--line)}
+.next h3{font-size:1.1rem;margin:0 0 4px}
+.next p{margin:0 0 12px;color:var(--muted)}
+.btn{display:inline-block;background:var(--cta);color:var(--cta-ink);font-weight:600;text-decoration:none;padding:12px 20px;border-radius:8px}
+.btn:hover{filter:brightness(.95)}
+details{border-top:1px solid var(--line);padding:12px 0}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:600}
+details p{margin:8px 0 0;color:var(--muted)}
+.fine{color:var(--muted);font-size:.85rem;margin-top:28px}
+@media (max-width:420px){.grid{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:no-preference){.col i{transition:height .25s ease}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Quanto seu dinheiro rende com juros compostos?</h1>
+  <p class="lead">Preencha os quatro campos e veja o resultado na hora. É grátis e não pede cadastro.</p>
+
+  <section class="calc" aria-label="Simulador">
+    <div class="grid">
+      <div><label for="ini">Valor inicial (R$)</label><input id="ini" inputmode="decimal" value="1000"></div>
+      <div><label for="apo">Aporte mensal (R$)</label><input id="apo" inputmode="decimal" value="300"></div>
+      <div><label for="taxa">Taxa de juros (%)</label><input id="taxa" inputmode="decimal" value="10"></div>
+      <div><label for="tipo">Taxa é</label><select id="tipo"><option value="ano">ao ano</option><option value="mes">ao mês</option></select></div>
+      <div><label for="anos">Prazo (anos)</label><input id="anos" inputmode="numeric" value="10"></div>
+    </div>
+
+    <div class="out" aria-live="polite">
+      <small>Você teria no final</small>
+      <div class="big" id="final">R$ 0,00</div>
+      <div class="leg">
+        <span><i style="background:var(--invest)"></i>Você investiu: <b id="inv">R$ 0,00</b></span>
+        <span><i style="background:var(--juros)"></i>Juros ganhos: <b id="jur">R$ 0,00</b></span>
+      </div>
+      <div class="chart" id="chart" role="img" aria-label="Gráfico de evolução ano a ano"></div>
+      <div class="axis"><span>Ano 1</span><span id="axisEnd">Ano 10</span></div>
+    </div>
+  </section>
+
+  <h2>Quer chegar nesse valor mais rápido?</h2>
+  <!-- TROQUE os links abaixo pelos seus links de afiliado/produto -->
+  <div class="next">
+    <h3>Comece a investir o aporte mensal</h3>
+    <p>Abra conta em uma corretora e automatize o aporte. O juro composto só funciona se você começa.</p>
+    <a class="btn" href="https://SEU-LINK-DE-AFILIADO.com" target="_blank" rel="noopener sponsored">Abrir conta grátis</a>
+  </div>
+  <div class="next">
+    <h3>Planilha de controle financeiro</h3>
+    <p>Descubra pra onde seu dinheiro vai e quanto sobra pra investir todo mês.</p>
+    <a class="btn" href="https://SEU-LINK-DO-PRODUTO.com" target="_blank" rel="noopener">Quero a planilha</a>
+  </div>
+
+  <h2>Dúvidas comuns</h2>
+  <details><summary>O que são juros compostos?</summary><p>São juros calculados sobre o valor investido mais os juros que ele já rendeu. Por isso o crescimento acelera com o tempo.</p></details>
+  <details><summary>Como a taxa anual vira taxa mensal?</summary><p>O simulador converte pela fórmula de taxa equivalente: (1 + taxa anual)^(1/12) − 1. Assim 12 meses rendem exatamente a taxa anual informada.</p></details>
+  <details><summary>O resultado considera imposto e inflação?</summary><p>Não. O valor é bruto e nominal. Imposto de renda, taxas da corretora e inflação reduzem o ganho real.</p></details>
+
+  <p class="fine">Simulação com fins educativos, sem garantia de rentabilidade e sem recomendação de investimento. Alguns links são de afiliado: se você contratar por eles, posso receber uma comissão, sem custo extra para você.</p>
+</main>
+
+<script>
+var $ = function(id){ return document.getElementById(id); };
+function num(id){ var v = parseFloat(String($(id).value).replace(",", ".")); return isFinite(v) && v > 0 ? v : 0; }
+function brl(v){ return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }); }
+
+function calc(){
+  var P = num("ini"), M = num("apo"), t = num("taxa");
+  var anos = Math.min(Math.max(Math.round(num("anos")), 1), 50);
+  var r = $("tipo").value === "ano" ? Math.pow(1 + t / 100, 1 / 12) - 1 : t / 100;
+  var serie = [];
+  for (var y = 1; y <= anos; y++){
+    var n = y * 12;
+    var fv = r === 0 ? P + M * n : P * Math.pow(1 + r, n) + M * (Math.pow(1 + r, n) - 1) / r;
+    serie.push({ inv: P + M * n, fv: fv });
+  }
+  var last = serie[serie.length - 1];
+  $("final").textContent = brl(last.fv);
+  $("inv").textContent = brl(last.inv);
+  $("jur").textContent = brl(last.fv - last.inv);
+  $("axisEnd").textContent = "Ano " + anos;
+  var max = last.fv || 1, html = "";
+  serie.forEach(function(s, i){
+    var hi = (s.inv / max * 100).toFixed(2), hj = ((s.fv - s.inv) / max * 100).toFixed(2);
+    html += '<div class="col" title="Ano ' + (i + 1) + ': ' + brl(s.fv) + '"><i class="i" style="height:' + hi + '%"></i><i class="j" style="height:' + hj + '%"></i></div>';
+  });
+  $("chart").innerHTML = html;
+  $("chart").setAttribute("aria-label", "Em " + anos + " anos você investe " + brl(last.inv) + " e chega a " + brl(last.fv));
+}
+
+["ini", "apo", "taxa", "tipo", "anos"].forEach(function(id){ $(id).addEventListener("input", calc); });
+calc();
+</script>
+</body>
+</html>
